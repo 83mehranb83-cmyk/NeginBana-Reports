@@ -34,16 +34,14 @@ function renderStats(){$('stats').innerHTML='<div class="stat"><b>'+fa(reports.l
 function reportHtml(r){return '<article class="report"><h3>'+jal(r.date)+' · بلوک '+r.block+'</h3><p>'+String(r.description||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).replace(/\n/g,'<br>')+'</p><div>'+r.people.map(p=>'<span class="pill">'+(p.name||'بدون نام')+' · بلوک '+p.block+' · '+p.floor+' · '+p.job+'</span>').join('')+'</div><div>'+r.photos.map(src=>'<img src="'+src+'">').join('')+'</div><div class="actions no-print"><button class="secondary" onclick="editReport(\''+r.id+'\')">ویرایش</button><button class="danger" onclick="deleteReport(\''+r.id+'\')">حذف</button><button class="secondary" onclick="printOne(\''+r.id+'\')">چاپ / PDF</button></div></article>'}
 function renderReports(){
  const q=normSearch($('filterName')?.value||'');
- const rawDate=normSearch($('filterDate')?.value||'').replace(/[.\\-]/g,'/').replace(/\\s/g,'');
- const fd=rawDate;
+ const fd=en($('filterDate')?.value||'').trim().replaceAll('-','/').replaceAll('.','/').replaceAll(' ','');
  const floor=$('filterFloor')?.value||'';
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const rows=[];
  [...reports].sort((a,b)=>b.date.localeCompare(a.date)).forEach(r=>{
-  const dateText=normSearch(jalShort(r.date)).replace(/[.\\-]/g,'/').replace(/\\s/g,'');
+  const dateText=en(jalShort(r.date)).replaceAll('-','/').replaceAll('.','/').replaceAll(' ','');
   if(fd&&dateText!==fd)return;
   (Array.isArray(r.people)?r.people:[]).forEach(p=>{
-   const personFloor=normSearch(p.floor||'');
    const haystack=normSearch([p.name,p.floor,p.job,p.block,r.block].join(' '));
    if(floor&&p.floor!==floor)return;
    if(q&&!haystack.includes(q))return;
@@ -52,7 +50,7 @@ function renderReports(){
  });
  $('reports').innerHTML=rows.length?'<p class="muted">'+fa(rows.length)+' ردیف فعالیت پیدا شد</p>'+rows.map(x=>'<article class="report"><h3>'+esc(x.person.name||'نام ثبت نشده')+'</h3><div><span class="pill">طبقه '+esc(x.person.floor||'—')+'</span><span class="pill">بلوک '+esc(x.person.block||x.reportBlock||'—')+'</span><span class="pill">'+esc(x.person.job||'فعالیت ثبت نشده')+'</span></div><p class="muted">تاریخ فعالیت: '+esc(jal(x.date))+'</p></article>').join(''):'<p class="muted">فردی با این مشخصات پیدا نشد.</p>';
 }
-function normSearch(v){return String(v??'').toLocaleLowerCase('fa').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f\u200e]/g,' ').replace(/\\s+/g,' ').trim()}
+function normSearch(v){return String(v??'').toLocaleLowerCase('fa').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replaceAll('\u200c',' ').replaceAll('\u200f',' ').replaceAll('\u200e',' ').split(' ').filter(Boolean).join(' ')}
 window.editReport=id=>{let r=reports.find(x=>x.id===id);if(!r)return;editId=id;pickerDate=parseISO(r.date);$('date').value=jalShort(r.date);$('block').value=r.block;$('description').value=r.description;$('people').innerHTML='';r.people.forEach(addPerson);$('save').textContent='ذخیره تغییرات';show('new')};window.deleteReport=id=>{if(confirm('این گزارش حذف شود؟')){reports=reports.filter(x=>x.id!==id);persist()}};const pdfEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 window.printOne=id=>{
  const r=reports.find(x=>x.id===id);if(!r)return;
