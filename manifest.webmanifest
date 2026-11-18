@@ -3,7 +3,7 @@
   "short_name": "نگین بنا",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#E7E0CF",
+  "background_color": "#DDD9C8",
   "theme_color": "#263B2E",
   "lang": "fa",
   "dir": "rtl",
