@@ -1,6 +1,6 @@
 {
-  "name": "گزارش کار نگین بنا",
-  "short_name": "نگین بنا",
+  "name": "گزارش کار روزانه",
+  "short_name": "گزارش کار روزانه",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#E8E0CC",
